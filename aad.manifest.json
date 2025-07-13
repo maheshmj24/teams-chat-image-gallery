@@ -100,6 +100,10 @@
                 {
                     "id": "User.Read",
                     "type": "Scope"
+                },
+                {
+                    "id": "Chat.Read",
+                    "type": "Scope"
                 }
             ]
         }

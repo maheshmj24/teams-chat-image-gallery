@@ -1,42 +1,52 @@
-// https://fluentsite.z22.web.core.windows.net/quick-start
 import {
   FluentProvider,
-  teamsLightTheme,
+  Spinner,
   teamsDarkTheme,
   teamsHighContrastTheme,
-  Spinner,
+  teamsLightTheme,
   tokens,
-} from "@fluentui/react-components";
-import { HashRouter as Router, Navigate, Route, Routes } from "react-router-dom";
-import { useTeamsUserCredential } from "@microsoft/teamsfx-react";
-import Privacy from "./Privacy";
-import TermsOfUse from "./TermsOfUse";
-import Tab from "./Tab";
-import { TeamsFxContext } from "./Context";
-import config from "./sample/lib/config";
+} from '@fluentui/react-components';
+import { useTeamsUserCredential } from '@microsoft/teamsfx-react';
+import { useMemo } from 'react';
+import {
+  Navigate,
+  Route,
+  HashRouter as Router,
+  Routes,
+} from 'react-router-dom';
+import config from '../config';
+import { TeamsFxContext } from './Context';
+import Privacy from './Privacy';
+import Tab from './Tab';
+import TermsOfUse from './TermsOfUse';
 
-/**
- * The main app which handles the initialization and routing
- * of the app.
- */
 export default function App() {
-  const { loading, theme, themeString, teamsUserCredential } = useTeamsUserCredential({
-    initiateLoginEndpoint: config.initiateLoginEndpoint!,
-    clientId: config.clientId!,
-  });
+  const { loading, theme, themeString, teamsUserCredential } =
+    useTeamsUserCredential({
+      initiateLoginEndpoint: config.initiateLoginEndpoint,
+      clientId: config.clientId,
+    });
+  let appliedTheme;
+  if (themeString === 'dark') {
+    appliedTheme = teamsDarkTheme;
+  } else if (themeString === 'contrast') {
+    appliedTheme = teamsHighContrastTheme;
+  } else {
+    appliedTheme = {
+      ...teamsLightTheme,
+      colorNeutralBackground3: '#eeeeee',
+    };
+  }
+
+  const contextValue = useMemo(
+    () => ({ theme, themeString, teamsUserCredential }),
+    [theme, themeString, teamsUserCredential]
+  );
+
   return (
-    <TeamsFxContext.Provider value={{ theme, themeString, teamsUserCredential }}>
+    <TeamsFxContext.Provider value={contextValue}>
       <FluentProvider
-        theme={
-          themeString === "dark"
-            ? teamsDarkTheme
-            : themeString === "contrast"
-            ? teamsHighContrastTheme
-            : {
-                ...teamsLightTheme,
-                colorNeutralBackground3: "#eeeeee",
-              }
-        }
+        theme={appliedTheme}
         style={{ background: tokens.colorNeutralBackground3 }}
       >
         <Router>
@@ -44,10 +54,10 @@ export default function App() {
             <Spinner style={{ margin: 100 }} />
           ) : (
             <Routes>
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/termsofuse" element={<TermsOfUse />} />
-              <Route path="/tab" element={<Tab />} />
-              <Route path="*" element={<Navigate to={"/tab"} />}></Route>
+              <Route path='/privacy' element={<Privacy />} />
+              <Route path='/termsofuse' element={<TermsOfUse />} />
+              <Route path='/tab' element={<Tab />} />
+              <Route path='*' element={<Navigate to={'/tab'} />}></Route>
             </Routes>
           )}
         </Router>

@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "id": "${{TEAMS_APP_ID}}",
     "developer": {
-        "name": "My App, Inc.",
+        "name": "Mahesh Markose J",
         "websiteUrl": "${{TAB_ENDPOINT}}",
         "privacyUrl": "${{TAB_ENDPOINT}}/index.html#/privacy",
         "termsOfUseUrl": "${{TAB_ENDPOINT}}/index.html#/termsofuse"
@@ -14,12 +14,12 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "teams-chat-gallery${{APP_NAME_SUFFIX}}",
-        "full": "Full name for teams-chat-gallery"
+        "short": "Image Gallery ${{APP_NAME_SUFFIX}}",
+        "full": "Image Gallery for Teams Chat"
     },
     "description": {
-        "short": "Short description of teams-chat-gallery",
-        "full": "Full description of teams-chat-gallery"
+        "short": "Image Gallery for Teams Chat",
+        "full": "Image Gallery for Teams Chat"
     },
     "accentColor": "#FFFFFF",
     "bots": [],
@@ -28,7 +28,7 @@
     "staticTabs": [
         {
             "entityId": "index",
-            "name": "Home",
+            "name": "Image gallery",
             "contentUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
             "websiteUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
             "scopes": [
