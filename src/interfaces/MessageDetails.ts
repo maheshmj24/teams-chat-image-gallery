@@ -9,11 +9,3 @@ export interface MessageDetails {
   };
   images: Photo[];
 }
-
-export interface ChatImagesResponse {
-  chatId: string;
-  totalImages: number;
-  totalChats: number;
-  messagesWithImages: MessageDetails[];
-  skipToken?: string;
-}

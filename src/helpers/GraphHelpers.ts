@@ -1,16 +1,63 @@
 import { TeamsUserCredential } from '@microsoft/teamsfx';
-import { ChatImagesResponse, MessageDetails } from '../interfaces/interfaces';
+import { ChatImagesResponse } from '../interfaces/ChatImagesResponse';
+import { MessageDetails } from '../interfaces/MessageDetails';
 import { extractImagesFromHtml } from './ImageHelpers';
 
 /**
- * Direct Microsoft Graph API call from frontend - No Azure backend needed
+ * Handles errors from the Graph API response.
+ * Throws specific errors based on the response status.
+ */
+function handleGraphResponseError(response: Response): void {
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error(
+        'Insufficient permissions to access chat messages. Please ensure the app has Chat.Read permission.'
+      );
+    } else if (response.status === 404) {
+      throw new Error('Chat not found. Please check the chat ID.');
+    } else {
+      throw new Error(
+        `Failed to fetch chat messages: ${response.status} ${response.statusText}`
+      );
+    }
+  }
+}
+
+/**
+ * Extracts messages with images from the Graph API response data.
+ * Filters messages that contain HTML content and extracts images from them.
+ */
+function extractMessagesWithImages(data: any): MessageDetails[] {
+  if (!data?.value) return [];
+  return data.value
+    .filter(
+      (message: any) =>
+        message?.body?.content && message?.body?.contentType === 'html'
+    )
+    .map((message: any) => {
+      const images = extractImagesFromHtml(message.body.content);
+      if (images.length > 0) {
+        return {
+          id: message.id,
+          createdDateTime: message.createdDateTime,
+          body: message.body,
+          images: images,
+        };
+      }
+      return null;
+    })
+    .filter((msg: MessageDetails | null) => msg !== null) as MessageDetails[];
+}
+
+/**
+ * Fetches chat images from Microsoft Graph API.
+ * Returns a response containing chat ID, total images, total chats, and messages with images.
  */
 export async function getChatImagesFromGraph(
   teamsUserCredential: TeamsUserCredential,
   chatId: string,
   skipToken?: string
 ): Promise<ChatImagesResponse & { skipToken?: string }> {
-  // Get access token for Microsoft Graph
   const accessToken = await teamsUserCredential.getToken([
     'https://graph.microsoft.com/Chat.Read',
   ]);
@@ -34,43 +81,10 @@ export async function getChatImagesFromGraph(
     },
   });
 
-  if (!response.ok) {
-    if (response.status === 403) {
-      throw new Error(
-        'Insufficient permissions to access chat messages. Please ensure the app has Chat.Read permission.'
-      );
-    } else if (response.status === 404) {
-      throw new Error('Chat not found. Please check the chat ID.');
-    } else {
-      throw new Error(
-        `Failed to fetch chat messages: ${response.status} ${response.statusText}`
-      );
-    }
-  }
+  handleGraphResponseError(response);
 
   const data = await response.json();
-  const messagesWithImages: MessageDetails[] = [];
-
-  // Process each message to extract images
-  if (data?.value) {
-    for (const message of data.value) {
-      if (
-        message?.body?.content &&
-        message?.body?.contentType === 'html' // filter here
-      ) {
-        const images = extractImagesFromHtml(message.body.content);
-
-        if (images.length > 0) {
-          messagesWithImages.push({
-            id: message.id,
-            createdDateTime: message.createdDateTime,
-            body: message.body,
-            images: images,
-          });
-        }
-      }
-    }
-  }
+  const messagesWithImages = extractMessagesWithImages(data);
 
   return {
     chatId: chatId,
