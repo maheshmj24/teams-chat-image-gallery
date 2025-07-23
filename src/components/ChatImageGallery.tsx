@@ -7,6 +7,7 @@ import InfiniteScroll from 'react-photo-album/scroll';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { getChatImagesFromGraph } from '../helpers/GraphHelpers';
+import { getImageNaturalSize } from '../helpers/ImageHelpers';
 import { TeamsFxContext } from './Context';
 
 // import optional lightbox plugins
@@ -60,9 +61,19 @@ export function ChatImageGallery() {
           chatId.trim(),
           localSkipToken ?? undefined
         );
-        const newPhotos = response.messagesWithImages.flatMap(
+
+        let newPhotos = response.messagesWithImages.flatMap(
           (msg) => msg.images
         );
+
+        // Fetch actual image sizes for each new photo
+        newPhotos = await Promise.all(
+          newPhotos.map(async (photo) => {
+            const { width, height } = await getImageNaturalSize(photo.src);
+            return { ...photo, width, height };
+          })
+        );
+
         accumulatedPhotos = [...accumulatedPhotos, ...newPhotos];
         localSkipToken = response.skipToken ?? null;
 
@@ -126,7 +137,6 @@ export function ChatImageGallery() {
             open={index >= 0}
             index={index}
             close={() => setIndex(-1)}
-            // enable optional lightbox plugins
             plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
           />
         </>
