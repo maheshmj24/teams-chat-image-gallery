@@ -1,6 +1,6 @@
 import { Spinner } from '@fluentui/react-components';
 import { app } from '@microsoft/teams-js';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Photo, RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
 import InfiniteScroll from 'react-photo-album/scroll';
@@ -25,7 +25,6 @@ export function ChatImageGallery() {
   const [index, setIndex] = useState(-1);
 
   const { teamsUserCredential } = useContext(TeamsFxContext);
-  const photosRef = useRef<Photo[]>([]);
 
   useEffect(() => {
     app.getContext().then((context) => {
@@ -81,8 +80,8 @@ export function ChatImageGallery() {
         if (!localSkipToken) break;
       }
 
-      photosRef.current = [...photosRef.current, ...accumulatedPhotos];
-      setPhotos(photosRef.current);
+      // Append to existing photos
+      setPhotos((prev) => [...prev, ...accumulatedPhotos]);
       setSkipToken(localSkipToken);
       setFirstLoad(false);
 
@@ -121,7 +120,6 @@ export function ChatImageGallery() {
               </div>
             }
             onClick={({ index }) => {
-              console.log(index);
               setIndex(index);
             }}
           >
@@ -133,7 +131,7 @@ export function ChatImageGallery() {
           </InfiniteScroll>
 
           <Lightbox
-            slides={photosRef.current}
+            slides={photos}
             open={index >= 0}
             index={index}
             close={() => setIndex(-1)}
