@@ -17,7 +17,7 @@ provision:
       # defined here.
       name: teams-chat-gallery
       # If the value is false, the action will not generate client secret for you
-      generateClientSecret: true
+      generateClientSecret: false
       # Authenticate users with a Microsoft work or school account in your
       # organization's Microsoft Entra tenant (for example, single tenant).
       signInAudience: AzureADMyOrg

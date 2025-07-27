@@ -7,7 +7,10 @@ import InfiniteScroll from 'react-photo-album/scroll';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { getChatImagesFromGraph } from '../helpers/GraphHelpers';
-import { getImageNaturalSize } from '../helpers/ImageHelpers';
+import {
+  fetchTeamsImageAsBlobUrl,
+  getImageNaturalSize,
+} from '../helpers/ImageHelpers';
 import { TeamsFxContext } from './Context';
 
 // import optional lightbox plugins
@@ -45,7 +48,7 @@ export function ChatImageGallery() {
       return null;
     }
 
-    const batchSize = 20; // Number of photos to fetch per batch
+    const batchSize = 10; // Number of photos to fetch per batch
     let accumulatedPhotos: Photo[] = [];
     let localSkipToken = skipToken;
 
@@ -55,38 +58,74 @@ export function ChatImageGallery() {
       }
 
       while (accumulatedPhotos.length < batchSize) {
-        const response = await getChatImagesFromGraph(
-          teamsUserCredential,
-          chatId.trim(),
-          localSkipToken ?? undefined
-        );
+        let response;
+        try {
+          response = await getChatImagesFromGraph(
+            teamsUserCredential,
+            chatId.trim(),
+            localSkipToken ?? undefined
+          );
+        } catch (err: any) {
+          // If login is required, prompt the user and retry once
+          // Needed for Desktop clients
+          if (
+            err.message?.includes('UiRequiredError') ||
+            err.message?.includes('login first')
+          ) {
+            await teamsUserCredential.login([
+              'https://graph.microsoft.com/Chat.Read',
+            ]);
+            response = await getChatImagesFromGraph(
+              teamsUserCredential,
+              chatId.trim(),
+              localSkipToken ?? undefined
+            );
+          } else {
+            throw err;
+          }
+        }
 
         let newPhotos = response.messagesWithImages.flatMap(
           (msg) => msg.images
         );
+        const accessToken = (
+          await teamsUserCredential.getToken([
+            'https://graph.microsoft.com/Chat.Read',
+          ])
+        )?.token;
 
-        // Fetch actual image sizes for each new photo
         newPhotos = await Promise.all(
           newPhotos.map(async (photo) => {
-            const { width, height } = await getImageNaturalSize(photo.src);
-            return { ...photo, width, height };
+            let blobUrl = photo.src;
+            try {
+              if (accessToken && photo.href) {
+                blobUrl = await fetchTeamsImageAsBlobUrl(
+                  photo.href,
+                  accessToken
+                );
+              }
+            } catch (e) {
+              // fallback to original src if fetch fails
+              console.error('Failed to fetch image as blob URL:', e);
+            }
+
+            const { width, height } = await getImageNaturalSize(blobUrl);
+            return { ...photo, width, height, src: blobUrl, href: undefined };
           })
         );
 
         accumulatedPhotos = [...accumulatedPhotos, ...newPhotos];
         localSkipToken = response.skipToken ?? null;
 
-        // Stop if no more data
         if (!localSkipToken) break;
       }
 
-      // Append to existing photos
       setPhotos((prev) => [...prev, ...accumulatedPhotos]);
       setSkipToken(localSkipToken);
       setFirstLoad(false);
 
       if (accumulatedPhotos.length === 0) {
-        return null; // No more photos to fetch
+        return null;
       }
 
       return accumulatedPhotos;

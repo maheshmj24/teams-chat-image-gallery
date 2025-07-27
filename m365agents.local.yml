@@ -14,7 +14,7 @@ provision:
       # defined here.
       name: teams-chat-gallery
       # If the value is false, the action will not generate client secret for you
-      generateClientSecret: true
+      generateClientSecret: false
       # Authenticate users with a Microsoft work or school account in your
       # organization's Microsoft Entra tenant (for example, single tenant).
       signInAudience: AzureADMyOrg
@@ -46,8 +46,6 @@ provision:
       run: echo "::set-teamsfx-env TAB_HOSTNAME=localhost";
         echo "::set-teamsfx-env TAB_DOMAIN=localhost:53000";
         echo "::set-teamsfx-env TAB_ENDPOINT=https://localhost:53000";
-        echo "::set-teamsfx-env FUNC_NAME=getUserProfile";
-        echo "::set-teamsfx-env FUNC_ENDPOINT=http://localhost:7071";
 
   # Apply the Microsoft Entra manifest to an existing Microsoft Entra app. Will use the object id in
   # manifest file to determine which Microsoft Entra app to update.
@@ -103,15 +101,11 @@ deploy:
     with:
       devCert:
         trust: true
-      func:
-        version: ~4.0.5455
-        symlinkDir: ./devTools/func
     # Write the information of installed development tool(s) into environment
     # file for the specified environment variable(s).
     writeToEnvironmentFile:
       sslCertFile: SSL_CRT_FILE
       sslKeyFile: SSL_KEY_FILE
-      funcPath: FUNC_PATH
 
   # Run npm command
   - uses: cli/runNpmCommand
@@ -131,5 +125,3 @@ deploy:
         SSL_KEY_FILE: ${{SSL_KEY_FILE}}
         VITE_CLIENT_ID: ${{AAD_APP_CLIENT_ID}}
         VITE_START_LOGIN_PAGE_URL: ${{TAB_ENDPOINT}}/auth-start.html
-        VITE_FUNC_NAME: ${{FUNC_NAME}}
-        VITE_FUNC_ENDPOINT: ${{FUNC_ENDPOINT}}

@@ -5,7 +5,7 @@
     "id": "${{TEAMS_APP_ID}}",
     "developer": {
         "name": "Mahesh Markose J",
-        "websiteUrl": "${{TAB_ENDPOINT}}",
+        "websiteUrl": "https://github.com/maheshmj24",
         "privacyUrl": "${{TAB_ENDPOINT}}/index.html#/privacy",
         "termsOfUseUrl": "${{TAB_ENDPOINT}}/index.html#/termsofuse"
     },
@@ -15,11 +15,11 @@
     },
     "name": {
         "short": "Image Gallery ${{APP_NAME_SUFFIX}}",
-        "full": "Image Gallery for Teams Chat"
+        "full": "Image Gallery - Browse Chat Images"
     },
     "description": {
-        "short": "Image Gallery for Teams Chat",
-        "full": "Image Gallery for Teams Chat"
+        "short": "Find images from Teams chat easily",
+        "full": "Easily find and browse all copied images shared in Teams chat, that don't appear in the Shared tab"
     },
     "accentColor": "#FFFFFF",
     "bots": [],

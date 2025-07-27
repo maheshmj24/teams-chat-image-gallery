@@ -4,6 +4,7 @@ env/.env.*.user
 env/.env.local
 .DS_Store
 build
+dist
 appPackage/build
 .deployment
 .localConfigs
@@ -16,3 +17,5 @@ appPackage/build
 
 # Dev tool directories
 /devTools/
+
+appPackage/local
