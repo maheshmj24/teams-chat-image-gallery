@@ -21,6 +21,13 @@ Perfect for Teams channels or group chats where lots of images are shared - now 
 
 This app uses the [On-Behalf-Of flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow) to implement SSO and make authenticated requests to Microsoft Graph to fetch chat images.
 
+## Built With
+
+- **[React Photo Album](https://github.com/igordanchenko/react-photo-album)** - Beautiful responsive photo gallery component
+- **[Yet Another React Lightbox](https://github.com/igordanchenko/yet-another-react-lightbox)** - Modern lightbox with zoom, slideshow, and navigation
+- **[Fluent UI React Components](https://github.com/microsoft/fluentui)** - Microsoft's design system for consistent Teams integration
+- **[Microsoft Graph API](https://docs.microsoft.com/en-us/graph/)** - For secure access to Teams chat data
+
 ## Get started with the Teams Chat Image Gallery
 
 > **Prerequisites**
