@@ -17,7 +17,7 @@ import {
 import config from '../config';
 import { TeamsFxContext } from './Context';
 import Privacy from './Privacy';
-import Tab from './Tab';
+import TeamsContextValidator from './TeamsContextValidator';
 import TermsOfUse from './TermsOfUse';
 
 export default function App() {
@@ -26,6 +26,7 @@ export default function App() {
       initiateLoginEndpoint: config.initiateLoginEndpoint,
       clientId: config.clientId,
     });
+
   let appliedTheme;
   if (themeString === 'dark') {
     appliedTheme = teamsDarkTheme;
@@ -56,7 +57,7 @@ export default function App() {
             <Routes>
               <Route path='/privacy' element={<Privacy />} />
               <Route path='/termsofuse' element={<TermsOfUse />} />
-              <Route path='/tab' element={<Tab />} />
+              <Route path='/tab' element={<TeamsContextValidator />} />
               <Route path='*' element={<Navigate to={'/tab'} />}></Route>
             </Routes>
           )}

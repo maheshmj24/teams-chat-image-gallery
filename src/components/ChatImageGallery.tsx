@@ -26,6 +26,8 @@ export function ChatImageGallery() {
   const [skipToken, setSkipToken] = useState<string | null>(null);
   const [firstLoad, setFirstLoad] = useState(true);
   const [index, setIndex] = useState(-1);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const { teamsUserCredential } = useContext(TeamsFxContext);
 
@@ -41,10 +43,20 @@ export function ChatImageGallery() {
   async function fetchPhotos(): Promise<Photo[] | null> {
     if (!chatId) {
       console.error(`Chat id couldn't be fetched.`);
+      // This should not happen due to ChatContextValidator, but keeping as safety check
+      setHasError(true);
+      setErrorMessage(
+        'Chat context not available. Please ensure you are in a Teams chat.'
+      );
       return null;
     }
     if (!teamsUserCredential) {
       console.error('Teams user credential is not available.');
+      // This should not happen due to TeamsContextValidator, but keeping as safety check
+      setHasError(true);
+      setErrorMessage(
+        'Authentication not available. Please ensure you are signed in to Teams.'
+      );
       return null;
     }
 
@@ -72,14 +84,46 @@ export function ChatImageGallery() {
             err.message?.includes('UiRequiredError') ||
             err.message?.includes('login first')
           ) {
-            await teamsUserCredential.login([
-              'https://graph.microsoft.com/Chat.Read',
-            ]);
-            response = await getChatImagesFromGraph(
-              teamsUserCredential,
-              chatId.trim(),
-              localSkipToken ?? undefined
+            try {
+              await teamsUserCredential.login([
+                'https://graph.microsoft.com/Chat.Read',
+              ]);
+              response = await getChatImagesFromGraph(
+                teamsUserCredential,
+                chatId.trim(),
+                localSkipToken ?? undefined
+              );
+            } catch (loginErr: any) {
+              console.error(
+                'Authentication failed after login attempt:',
+                loginErr
+              );
+              setHasError(true);
+              setErrorMessage(
+                'Authentication failed. Please try refreshing the app or contact your admin.'
+              );
+              return null;
+            }
+          } else if (
+            err.message?.includes('Forbidden') ||
+            err.message?.includes('403')
+          ) {
+            console.error('Permission denied:', err);
+            setHasError(true);
+            setErrorMessage(
+              'Permission denied. You may not have access to read messages in this chat.'
             );
+            return null;
+          } else if (
+            err.message?.includes('Unauthorized') ||
+            err.message?.includes('401')
+          ) {
+            console.error('Authentication error:', err);
+            setHasError(true);
+            setErrorMessage(
+              'Authentication expired. Please refresh the app and try again.'
+            );
+            return null;
           } else {
             throw err;
           }
@@ -129,8 +173,23 @@ export function ChatImageGallery() {
       }
 
       return accumulatedPhotos;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching chat images:', error);
+      setHasError(true);
+
+      // Provide more specific error messages based on error type
+      if (error.message?.includes('Network')) {
+        setErrorMessage(
+          'Network error. Please check your connection and try again.'
+        );
+      } else if (error.message?.includes('timeout')) {
+        setErrorMessage('Request timed out. Please try again.');
+      } else {
+        setErrorMessage(
+          'An unexpected error occurred while loading images. Please try refreshing the app.'
+        );
+      }
+
       return null;
     }
   }
@@ -143,7 +202,36 @@ export function ChatImageGallery() {
             fetch={fetchPhotos}
             error={
               <div style={{ textAlign: 'center', color: 'red', margin: 20 }}>
-                Error loading images.
+                {hasError && errorMessage ? (
+                  <>
+                    <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                      ⚠️ Error Loading Images
+                    </div>
+                    <div>{errorMessage}</div>
+                    <button
+                      onClick={() => {
+                        setHasError(false);
+                        setErrorMessage('');
+                        setPhotos([]);
+                        setSkipToken(null);
+                        setFirstLoad(true);
+                      }}
+                      style={{
+                        marginTop: '12px',
+                        padding: '8px 16px',
+                        backgroundColor: '#0078d4',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Try Again
+                    </button>
+                  </>
+                ) : (
+                  'Error loading images.'
+                )}
               </div>
             }
             loading={

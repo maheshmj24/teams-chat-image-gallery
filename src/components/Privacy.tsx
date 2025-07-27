@@ -3,11 +3,20 @@ import React from 'react';
 class Privacy extends React.Component {
   render() {
     return (
-      <div style={{ padding: '20px', maxWidth: '800px', lineHeight: '1.6' }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          padding: '20px',
+          maxWidth: '800px',
+          margin: '0 auto',
+          lineHeight: '1.6',
+          backgroundColor: '#f5f5f5',
+        }}
+      >
         <h1>Privacy Statement</h1>
 
         <h2>Data Collection and Usage</h2>
-        <p>Image Archive is designed with privacy in mind. This application:</p>
+        <p>Image Gallery is designed with privacy in mind. This application:</p>
         <ul>
           <li>
             <strong>Does not store</strong> any of your chat data, images, or

@@ -3,7 +3,16 @@ import React from 'react';
 class TermsOfUse extends React.Component {
   render() {
     return (
-      <div style={{ padding: '20px', maxWidth: '800px', lineHeight: '1.6' }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          padding: '20px',
+          maxWidth: '800px',
+          margin: '0 auto',
+          lineHeight: '1.6',
+          backgroundColor: '#f5f5f5',
+        }}
+      >
         <h1>Terms of Use</h1>
 
         <h2>Acceptance of Terms</h2>

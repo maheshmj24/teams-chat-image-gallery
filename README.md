@@ -39,7 +39,7 @@ This app uses the [On-Behalf-Of flow](https://learn.microsoft.com/en-us/azure/ac
 
 **Congratulations**! You are running an application that displays a beautiful image gallery of all images shared in your Teams chat.
 
-![Teams Chat Image Gallery Demo](https://github.com/OfficeDev/TeamsFx/assets/63089166/9599b53c-8f89-493f-9f7e-9edae1f9be54)
+![Teams Chat Image Gallery Demo](images/teams-chat-image-gallery.gif)
 
 ## What's included in the project
 
