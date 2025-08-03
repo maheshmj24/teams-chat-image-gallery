@@ -4,7 +4,10 @@ env/.env.*.user
 env/.env.local
 .DS_Store
 build
-dist
+
+# Uncommented in deploy branch to host on github pages
+# dist
+
 appPackage/build
 .deployment
 .localConfigs
