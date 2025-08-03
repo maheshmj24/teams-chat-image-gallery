@@ -23,9 +23,9 @@
         microsoftTeams.app.getContext().then(async (context) => {
           // Generate random state string and store it, so we can verify it in the callback
           var currentURL = new URL(window.location);
-          var clientId = currentURL.searchParams.get("clientId");
-          var scope = currentURL.searchParams.get("scope");
-          var loginHint = currentURL.searchParams.get("loginHint");
+          var clientId = currentURL.searchParams.get('clientId');
+          var scope = currentURL.searchParams.get('scope');
+          var loginHint = currentURL.searchParams.get('loginHint');
 
           const msalConfig = {
             auth: {
@@ -34,15 +34,26 @@
               navigateToLoginRequestUrl: false,
             },
             cache: {
-              cacheLocation: "sessionStorage",
+              cacheLocation: 'sessionStorage',
             },
           };
 
           const msalInstance = new msal.PublicClientApplication(msalConfig);
-          const scopesArray = scope.split(" ");
+          const scopesArray = scope.split(' ');
+
+          // Dynamically construct redirect URI based on current location
+          // This works for both GitHub Pages subdirectory and root deployments
+          const currentPath = window.location.pathname;
+          const basePath = currentPath.replace('/auth-start.html', '');
+          const redirectUri =
+            window.location.origin +
+            basePath +
+            '/auth-end.html' +
+            `?clientId=${clientId}`;
+
           const scopesRequest = {
             scopes: scopesArray,
-            redirectUri: window.location.origin + `/auth-end.html?clientId=${clientId}`,
+            redirectUri: redirectUri,
             loginHint: loginHint,
           };
           await msalInstance.loginRedirect(scopesRequest);
