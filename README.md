@@ -71,6 +71,10 @@ The app can be hosted in a Static Web App or any kind of other hosting services.
 Pass the Client ID and Login Page URL as environment variables before building like below:
 
 ```powershell
+#Github pages
+$env:VITE_START_LOGIN_PAGE_URL="https://<<HOST-DOMAIN>>/auth-start.html"; $env:VITE_CLIENT_ID="<<CLIENT-ID>>";$env:VITE_BASE_PATH="/teams-chat-image-gallery/"; npm run build
+
+#Static website
 $env:VITE_START_LOGIN_PAGE_URL="https://<<HOST-DOMAIN>>/auth-start.html"; $env:VITE_CLIENT_ID="<<CLIENT-ID>>"; npm run build
 ```
 
